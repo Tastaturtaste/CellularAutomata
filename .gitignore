@@ -3,5 +3,4 @@
 **/.vs/**
 **/*.user
 **/*.filters
-**/*.vcxproj
 **/*.vscode
