@@ -8,9 +8,10 @@
 class GameOfLife
 {
 	using uint = unsigned int;
+	using point = sf::Vector2u;
 
-	uint m_FieldHeight;
 	uint m_FieldWidth;
+	uint m_FieldHeight;
 	uint m_CellSize ;
 	sf::Color m_FieldBackgroundColor;
 	sf::Color m_FieldLineColor;
@@ -22,14 +23,13 @@ class GameOfLife
 	sf::Time m_GameloopDelta = sf::milliseconds(500);
 
 public:
-	GameOfLife(uint height = 600, uint width = 600, uint CellSize = 20, sf::Color backgroundColor = sf::Color::Black, sf::Color lineColor = sf::Color::Red, sf::Color ActiveCellColor = sf::Color::Yellow);
+	GameOfLife(point topleft = { 0,0 }, point botright = { 600,400 }, uint CellSize = 20, sf::Color backgroundColor = sf::Color::Black, sf::Color lineColor = sf::Color::Red, sf::Color ActiveCellColor = sf::Color::Yellow);
 	const sf::RectangleShape getShape() const;
 	void setBackground(sf::Color color);
 	void ClearAll();
 	void ActivateAll();
 	void Update();
 	void switchCell(sf::Vector2f mousePos);
-	void Initialize();
 	void Run();
 
 };

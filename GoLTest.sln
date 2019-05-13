@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GoLTest", "GoLTest\GoLTest.vcxproj", "{02DFE50A-39FA-4432-954A-C262B1C20D90}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CellEngine", "CellEngine\CellEngine.vcxproj", "{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -26,6 +28,14 @@ Global
 		{02DFE50A-39FA-4432-954A-C262B1C20D90}.Release|x64.Build.0 = Release|x64
 		{02DFE50A-39FA-4432-954A-C262B1C20D90}.Release|x86.ActiveCfg = Release|Win32
 		{02DFE50A-39FA-4432-954A-C262B1C20D90}.Release|x86.Build.0 = Release|Win32
+		{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}.Debug|x64.ActiveCfg = Debug|x64
+		{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}.Debug|x64.Build.0 = Debug|x64
+		{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}.Debug|x86.ActiveCfg = Debug|Win32
+		{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}.Debug|x86.Build.0 = Debug|Win32
+		{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}.Release|x64.ActiveCfg = Release|x64
+		{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}.Release|x64.Build.0 = Release|x64
+		{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}.Release|x86.ActiveCfg = Release|Win32
+		{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

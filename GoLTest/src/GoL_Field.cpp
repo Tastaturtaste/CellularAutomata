@@ -1,15 +1,15 @@
 #include "GoL_Field.h"
 
-GameOfLife::GameOfLife(uint height, uint width, uint CellSize, sf::Color backgroundColor, sf::Color lineColor, sf::Color ActiveCellColor)
-	: m_FieldHeight(height), m_FieldWidth(width), m_CellSize(CellSize), m_FieldBackgroundColor(backgroundColor), m_FieldLineColor(lineColor), 
+GameOfLife::GameOfLife(point topleft, point botright, uint CellSize, sf::Color backgroundColor, sf::Color lineColor, sf::Color ActiveCellColor)
+	: m_FieldWidth(botright.x - topleft.x), m_FieldHeight(botright.y - topleft.y), m_CellSize(CellSize), m_FieldBackgroundColor(backgroundColor), m_FieldLineColor(lineColor),
 	m_ActiveCellColor(ActiveCellColor)
 {
-	m_FieldShape = sf::RectangleShape(sf::Vector2f(m_FieldHeight, m_FieldWidth));
+	m_FieldShape = sf::RectangleShape(sf::Vector2f(m_FieldWidth, m_FieldHeight));
 	m_FieldShape.setFillColor(m_FieldBackgroundColor);
-	m_Cells.resize(m_FieldWidth / CellSize);
+	m_Cells.resize(m_FieldHeight / CellSize);
 	for (uint i = 0; i < m_Cells.size(); i++)
 	{
-		m_Cells[i].resize(m_FieldHeight / CellSize);
+		m_Cells[i].resize(m_FieldWidth / CellSize);
 	}
 	for (uint i = 0; i < m_Cells.size(); i++)
 		for (uint j = 0; j < m_Cells[i].size(); j++)
@@ -17,8 +17,28 @@ GameOfLife::GameOfLife(uint height, uint width, uint CellSize, sf::Color backgro
 			m_Cells[i][j].setCellSize(m_CellSize);
 			m_Cells[i][j].setPosition(sf::Vector2f(j*CellSize, i*CellSize));
 		}
-	GameField.create(sf::VideoMode(m_FieldHeight, m_FieldWidth), "Game of Life", sf::Style::Default ^ sf::Style::Resize);
+	GameField.create(sf::VideoMode(m_FieldWidth, m_FieldHeight), "Game of Life", sf::Style::Default ^ sf::Style::Resize);
 	GameField.setFramerateLimit(60);
+	GameField.setPosition(static_cast<sf::Vector2i>(topleft));
+
+	// connect cells so they know what their neighbors are
+	for (uint i = 0; i < m_Cells.size(); i++)
+	{
+		for (uint j = 0; j < m_Cells[i].size(); j++)
+		{
+			auto& cell = m_Cells[i][j];
+
+			i > 0 && j > 0 ? cell.setNeighbor(0, &m_Cells[i - 1][j - 1]) : cell.setNeighbor(0, &BorderCell);
+			i > 0 ? cell.setNeighbor(1, &m_Cells[i - 1][j]) : cell.setNeighbor(1, &BorderCell);
+			i > 0 && j < m_Cells[i].size() - 1 ? cell.setNeighbor(2, &m_Cells[i - 1][j + 1]) : cell.setNeighbor(2, &BorderCell);
+			j > 0 ? cell.setNeighbor(3, &m_Cells[i][j - 1]) : cell.setNeighbor(3, &BorderCell);
+			j < m_Cells[i].size() - 1 ? cell.setNeighbor(4, &m_Cells[i][j + 1]) : cell.setNeighbor(4, &BorderCell);
+			i < m_Cells.size() - 1 && j > 0 ? cell.setNeighbor(5, &m_Cells[i + 1][j - 1]) : cell.setNeighbor(5, &BorderCell);
+			i < m_Cells.size() - 1 ? cell.setNeighbor(6, &m_Cells[i + 1][j]) : cell.setNeighbor(6, &BorderCell);
+			i < m_Cells.size() - 1 && j < m_Cells[i].size() - 1 ? cell.setNeighbor(7, &m_Cells[i + 1][j + 1]) : cell.setNeighbor(7, &BorderCell);
+
+		}
+	}
 }
 
 const sf::RectangleShape GameOfLife::getShape() const
@@ -61,26 +81,6 @@ void GameOfLife::ActivateAll()
 			m_Cells[i][j].Activate();
 }
 
-void GameOfLife::Initialize()
-{
-	std::array<Cell*, 8> neighbors{ nullptr };
-	for(uint i = 0; i < m_Cells.size(); i++)
-		for (uint j = 0; j < m_Cells[i].size(); j++)
-		{
-			i > 0 && j > 0										? neighbors[0] = &m_Cells[i - 1][j - 1] : neighbors[0] = &BorderCell;
-			i > 0												? neighbors[1] = &m_Cells[i - 1][j] : neighbors[1] = &BorderCell;
-			i > 0 && j < m_Cells[i].size() - 1					? neighbors[2] = &m_Cells[i - 1][j + 1] : neighbors[2] = &BorderCell;
-			j > 0												? neighbors[3] = &m_Cells[i][j - 1] : neighbors[3] = &BorderCell;
-			j < m_Cells[i].size() - 1							? neighbors[4] = &m_Cells[i][j + 1] : neighbors[4] = &BorderCell;
-			i < m_Cells.size() - 1 && j > 0						? neighbors[5] = &m_Cells[i + 1][j - 1] : neighbors[5] = &BorderCell;
-			i < m_Cells.size() - 1								? neighbors[6] = &m_Cells[i + 1][j] : neighbors[6] = &BorderCell;
-			i < m_Cells.size() - 1 && j < m_Cells[i].size() - 1 ? neighbors[7] = &m_Cells[i + 1][j + 1] : neighbors[7] = &BorderCell;
-
-			m_Cells[i][j].setNeighbors(neighbors);
-		}
-
-
-}
 
 void GameOfLife::Run()
 {

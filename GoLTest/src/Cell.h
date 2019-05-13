@@ -30,6 +30,8 @@ public:
 	void Activate(); // Activates the cell and resets nextActivation
 	void ResolveActivation();
 	void setNeighbors(const std::array<Cell*, 8>& neighbors);
+	void setNeighbor(const uint idx, Cell* neighbor);
+	const auto& getNeighbors() const;
 	void ResolveNextActivation();
 	void setPosition(const sf::Vector2f& position);
 	sf::Vector2f getPostion() const;

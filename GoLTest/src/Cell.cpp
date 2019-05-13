@@ -39,6 +39,16 @@ void Cell::setNeighbors(const std::array<Cell*, 8>& neighbors)
 	std::copy(neighbors.begin(), neighbors.end(), m_Neighbors.begin());
 }
 
+void Cell::setNeighbor(const uint idx, Cell* neighbor)
+{
+	m_Neighbors.at(idx) = neighbor;
+}
+
+const auto& Cell::getNeighbors() const
+{
+	return m_Neighbors;
+}
+
 void Cell::ResolveNextActivation()
 {
 	uint activation = std::accumulate(m_Neighbors.begin(), m_Neighbors.end(), 0, [](uint a, const Cell* cell) {return a + static_cast<uint>(cell->m_Active); });
