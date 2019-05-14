@@ -15,7 +15,7 @@ struct Config {
 	uint cell_size = 20;
 	sf::Time epoch_time = sf::milliseconds(500);
 	point topleft = { 0,0 };
-	point botright = { 600,400 };
+	point botright = { 1200,800 };
 	uint framerate_limit = 60;
 	const sf::Time delta_gamespeed = sf::milliseconds(10);
 };
