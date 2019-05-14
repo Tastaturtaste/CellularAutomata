@@ -8,6 +8,7 @@
 #include "Base_game.h"
 
 
+
 class engine {
 public:
 	using uint = unsigned int;
@@ -28,7 +29,9 @@ private:
 	Cell border_cell;
 	
 	bool is_paused = true;
-	sf::Clock timer;
+	bool game_running = true;
+	const float max_fps = static_cast<float>(m_config.framerate_limit);
+	sf::Mutex mut_window;
 
 	void update_cells();
 	void Update();
@@ -38,6 +41,8 @@ private:
 	void handle_events();
 	void mouse_input();
 	void switch_pause();
+	void draw();
+	
 
 public:
 	engine(std::unique_ptr<Base_game> game, const Config& config = Config());

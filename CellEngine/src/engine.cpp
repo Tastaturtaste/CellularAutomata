@@ -9,6 +9,7 @@
 engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 	: m_color_lookup(game->get_color_lookup()), m_game(std::move(game)), m_config(config), m_cell_shape(sf::Vector2f(static_cast<float>(config.cell_size), static_cast<float>(config.cell_size))), border_cell(Cell({ 0u, 0u }, m_cell_shape, 0u, m_color_lookup))
 {
+	//sf::Lock lock(mut_window);
 	if (m_config.fullscreen)
 	{
 		sf::VideoMode videomode = *(sf::VideoMode::getFullscreenModes().begin());
@@ -17,7 +18,6 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 
 		m_window.create(videomode, m_game->get_title(), sf::Style::Fullscreen);
 		m_window.setPosition(m_config.topleft);
-
 	}
 	else
 	{
@@ -91,17 +91,18 @@ void engine::ClearAll()
 void engine::handle_events()
 {
 	sf::Event evnt;
+	//sf::Lock lock(mut_window);
 	while (m_window.pollEvent(evnt))
 	{
 		switch (evnt.type)
 		{
-		case sf::Event::Closed: m_window.close(); break;
+		case sf::Event::Closed: game_running = false; break;
 		case sf::Event::MouseButtonPressed: 
 			if (evnt.mouseButton.button == sf::Mouse::Left) mouse_input(); break;
 		case sf::Event::KeyPressed:
 			switch (evnt.key.code)
 			{
-			case sf::Keyboard::Escape: m_window.close(); break;
+			case sf::Keyboard::Escape: game_running = false; break;
 			case sf::Keyboard::Space: switch_pause(); break;
 			case sf::Keyboard::BackSpace: ClearAll(); break;
 			case sf::Keyboard::Right: m_config.epoch_time -= m_config.delta_gamespeed; break;
@@ -117,6 +118,7 @@ void engine::mouse_input()
 {
 	static std::unordered_set<const Cell*> cells;
 	static Cell* current_cell;
+	//sf::Lock lock(mut_window);
 	while (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		current_cell = &mousepos_to_cell(sf::Mouse::getPosition(m_window));
@@ -133,6 +135,27 @@ void engine::mouse_input()
 void engine::switch_pause()
 {
 	is_paused = !is_paused;
+}
+
+void engine::draw()
+{
+	sf::Time frame_time = sf::milliseconds(1000) / max_fps;
+	sf::Clock draw_clock;
+	m_window.setActive(true);
+	while (game_running)
+	{
+		//sf::Lock lock(mut_window);
+		m_window.clear(sf::Color::White);
+		m_window.draw(m_FieldShape);
+		for (const auto& row : m_Cells)
+			for (const auto& cell : row)
+				m_window.draw(cell.get_shape());
+	//sf::sleep(frame_time - draw_clock.getElapsedTime());
+		//sf::Lock lock(mut_window);
+		m_window.display();
+		draw_clock.restart();
+	}
+	m_window.setActive(false);
 }
 
 void engine::update_cells()
@@ -157,27 +180,30 @@ void engine::Update()
 
 void engine::Run()
 {
-	sf::Time time = timer.restart();
-	sf::Time deltaTime;
+	sf::Clock timer;
+	timer.restart();
+	
+	m_window.setActive(false);
+	sf::Thread draw_thread = sf::Thread(&engine::draw, this);
+	draw_thread.launch();
 
-	while (m_window.isOpen())
+	sf::Time last_update = timer.restart();
+	sf::Time deltaTime;
+	while (game_running)
 	{
 		if (!is_paused)
 		{
-			deltaTime = timer.getElapsedTime();
+			deltaTime = timer.getElapsedTime() - last_update;
 			if (deltaTime > m_config.epoch_time)
 			{
 				Update();
-				timer.restart();
+				last_update = timer.getElapsedTime();
 			}
 		}
 		
 		handle_events();
-		m_window.clear(sf::Color::White);
-		m_window.draw(m_FieldShape);
-		for (auto& row : m_Cells)
-			for (auto& cell : row)
-				m_window.draw(cell.get_shape());
-		m_window.display();
 	}
+	//sf::Lock lock(mut_window);
+	m_window.close();
 }
+
