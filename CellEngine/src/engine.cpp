@@ -89,8 +89,11 @@ void engine::handle_events()
 		case sf::Event::KeyPressed:
 			switch (evnt.key.code)
 			{
+			case sf::Keyboard::Escape: m_window.close(); break;
 			case sf::Keyboard::Space: switch_pause(); break;
 			case sf::Keyboard::BackSpace: ClearAll(); break;
+			case sf::Keyboard::Right: m_config.epoch_time -= m_config.delta_gamespeed; break;
+			case sf::Keyboard::Left: m_config.epoch_time += m_config.delta_gamespeed; break;
 			}
 		default:
 			break;
@@ -133,12 +136,11 @@ void engine::Run()
 		if (!is_paused)
 		{
 			deltaTime = timer.getElapsedTime();
-			if (deltaTime < m_config.epoch_time)
+			if (deltaTime > m_config.epoch_time)
 			{
-				sf::sleep(m_config.epoch_time - deltaTime);
+				Update();
+				timer.restart();
 			}
-			Update();
-			timer.restart();
 		}
 		
 		handle_events();
