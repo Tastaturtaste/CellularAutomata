@@ -2,6 +2,8 @@
 #include <SFML\Graphics.hpp>
 #include <iostream>
 #include <algorithm>
+#include <unordered_set>
+
 #define LOG(x) std::cout << x << "\n"
 
 engine::engine(std::unique_ptr<Base_game> game, const Config& config)
@@ -95,12 +97,7 @@ void engine::handle_events()
 		{
 		case sf::Event::Closed: m_window.close(); break;
 		case sf::Event::MouseButtonPressed: 
-			if (evnt.mouseButton.button == sf::Mouse::Left)
-			{
-				Cell& cell = mousepos_to_cell({ evnt.mouseButton.x, evnt.mouseButton.y });
-			cell.set_status(m_game->on_click_cell(cell));
-			}
-			break;
+			if (evnt.mouseButton.button == sf::Mouse::Left) mouse_input(); break;
 		case sf::Event::KeyPressed:
 			switch (evnt.key.code)
 			{
@@ -114,6 +111,23 @@ void engine::handle_events()
 			break;
 		}
 	}
+}
+
+void engine::mouse_input()
+{
+	static std::unordered_set<const Cell*> cells;
+	static Cell* current_cell;
+	while (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	{
+		current_cell = &mousepos_to_cell(sf::Mouse::getPosition(m_window));
+		if (cells.find(current_cell) == cells.end())
+		{
+			current_cell->set_status(m_game->on_click_cell(*current_cell));
+			cells.insert(current_cell);
+		}
+	}
+	cells.clear();
+	current_cell = nullptr;
 }
 
 void engine::switch_pause()

@@ -36,6 +36,7 @@ private:
 	const sf::RectangleShape& getShape() const;
 	void ClearAll();
 	void handle_events();
+	void mouse_input();
 	void switch_pause();
 
 public:
