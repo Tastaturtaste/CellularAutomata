@@ -1,4 +1,5 @@
 #include "Cell.h"
+#include <SFML\Graphics.hpp>
 
 #include <numeric>
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <unordered_map>
-#include <SFML\Graphics.hpp>
+#include <memory>
+
 #include "Cell.h"
 #include "Config.h"
 #include "Base_game.h"
-#include <memory>
 
 
 class engine {

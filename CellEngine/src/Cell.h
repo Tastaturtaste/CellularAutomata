@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
+#include <SFML\Graphics.hpp>
 
-#include "SFML/Graphics.hpp"
 
 
 /*
@@ -23,7 +23,6 @@ public:
 
 	Cell(sf::Vector2u idx, const sf::RectangleShape& cell_shape, uint status, const std::vector<sf::Color>& color_lookup);
 	inline const sf::RectangleShape& get_shape() const { return m_body; };
-	//void set_position(sf::Vector2i pos); // pos counted from top left corner
 	void set_status(const uint status);
 	const Cell::uint get_status() const;
 };

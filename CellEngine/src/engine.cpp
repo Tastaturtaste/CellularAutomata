@@ -1,4 +1,5 @@
 #include "engine.h"
+#include <SFML\Graphics.hpp>
 #include <iostream>
 #include <algorithm>
 #define LOG(x) std::cout << x << "\n"
@@ -21,7 +22,7 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 		m_FieldShape = sf::RectangleShape(sf::Vector2f(static_cast<float>(m_config.botright.x - m_config.topleft.x), static_cast<float>(m_config.botright.y - m_config.topleft.y)));
 		m_FieldShape.setPosition(static_cast<sf::Vector2f>(m_config.topleft));
 
-		m_window.create(sf::VideoMode(static_cast<uint>(m_FieldShape.getSize().x), static_cast<uint>(m_FieldShape.getSize().y)), m_game->get_title(), sf::Style::Default ^ sf::Style::Resize);
+		m_window.create(sf::VideoMode(static_cast<uint>(m_FieldShape.getSize().x), static_cast<uint>(m_FieldShape.getSize().y), sf::VideoMode::getDesktopMode().bitsPerPixel), m_game->get_title(), sf::Style::Default ^ sf::Style::Resize);
 		m_window.setPosition(m_config.topleft);
 	}
 	m_FieldShape.setFillColor(m_config.background_color);
