@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CellEngine", "CellEngine\CellEngine.vcxproj", "{52E05DB6-FA9E-421D-9153-0B0CA747BBB3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameOfLife", "GoL_with_engine\GoL_with_engine.vcxproj", "{998BB547-55DE-40CD-8A2B-D6D16F05F672}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameOfLife", "GameOfLife\GameOfLife.vcxproj", "{998BB547-55DE-40CD-8A2B-D6D16F05F672}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
