@@ -3,27 +3,41 @@
 #include <algorithm>
 #define LOG(x) std::cout << x << "\n"
 
-engine::engine(std::unique_ptr<Base_gamerules> gamerules, const Config& config)
-	: m_color_lookup(config.color_lookup), m_gamerules(std::move(gamerules)), m_config(config), m_cell_shape(sf::Vector2f(m_config.cell_size, m_config.cell_size)), border_cell(Cell({ 0u, 0u }, m_cell_shape, 0u, m_color_lookup))
+engine::engine(std::unique_ptr<Base_game> game, const Config& config)
+	: m_color_lookup(game->get_color_lookup()), m_game(std::move(game)), m_config(config), m_cell_shape(sf::Vector2f(static_cast<float>(config.cell_size), static_cast<float>(config.cell_size))), border_cell(Cell({ 0u, 0u }, m_cell_shape, 0u, m_color_lookup))
 {
-	m_FieldShape = sf::RectangleShape(sf::Vector2f(m_config.botright.x - m_config.topleft.x, m_config.botright.y - m_config.topleft.y));
-	m_FieldShape.setPosition(static_cast<sf::Vector2f>(m_config.topleft));
+	if (m_config.fullscreen)
+	{
+		sf::VideoMode videomode = *(sf::VideoMode::getFullscreenModes().begin());
+		m_FieldShape = sf::RectangleShape(sf::Vector2f(static_cast<float>(videomode.width), static_cast<float>(videomode.height)));
+		m_FieldShape.setPosition(sf::Vector2f(0.0f,0.0f));
+
+		m_window.create(videomode, m_game->get_title(), sf::Style::Fullscreen);
+		m_window.setPosition(m_config.topleft);
+
+	}
+	else
+	{
+		m_FieldShape = sf::RectangleShape(sf::Vector2f(static_cast<float>(m_config.botright.x - m_config.topleft.x), static_cast<float>(m_config.botright.y - m_config.topleft.y)));
+		m_FieldShape.setPosition(static_cast<sf::Vector2f>(m_config.topleft));
+
+		m_window.create(sf::VideoMode(static_cast<uint>(m_FieldShape.getSize().x), static_cast<uint>(m_FieldShape.getSize().y)), m_game->get_title(), sf::Style::Default ^ sf::Style::Resize);
+		m_window.setPosition(m_config.topleft);
+	}
 	m_FieldShape.setFillColor(m_config.background_color);
-	m_window.create(sf::VideoMode(m_FieldShape.getSize().x, m_FieldShape.getSize().y), m_config.title, sf::Style::Default ^ sf::Style::Resize);
 	m_window.setFramerateLimit(m_config.framerate_limit);
-	m_window.setPosition(m_config.topleft);
 	
 	m_cell_shape.setOutlineThickness(-m_config.cellboarder_percentage * m_config.cell_size);
 	m_cell_shape.setOutlineColor(m_config.cellboarder_color);
 	
-	m_Cells.reserve(m_FieldShape.getSize().y / m_config.cell_size);
+	m_Cells.reserve(static_cast<size_t>(m_FieldShape.getSize().y / m_config.cell_size));
 	for (uint y = 0; y < m_FieldShape.getSize().y / m_config.cell_size; y++)
 	{
 		m_Cells.emplace_back(std::vector<Cell>());
-		m_Cells[y].reserve(m_FieldShape.getSize().x / m_config.cell_size);
+		m_Cells[y].reserve(static_cast<size_t>(m_FieldShape.getSize().x / m_config.cell_size));
 		for (uint x = 0; x < m_FieldShape.getSize().x / m_config.cell_size; x++)
 		{
-			m_cell_shape.setPosition(sf::Vector2f(x * m_cell_size, y * m_cell_size));
+			m_cell_shape.setPosition(sf::Vector2f(static_cast<float>(x * m_cell_size), static_cast<float>(y * m_cell_size)));
 			m_Cells[y].emplace_back(sf::Vector2u( x, y ), m_cell_shape, 0u, m_color_lookup);
 		}
 	}
@@ -59,9 +73,9 @@ const sf::RectangleShape& engine::getShape() const
 	return m_FieldShape;
 }
 
-Cell & engine::mousepos_to_cell(sf::Vector2f mouse_pos)
+Cell & engine::mousepos_to_cell(sf::Vector2i mouse_pos)
 {
-	return m_Cells[static_cast<uint>(mouse_pos.y) / m_cell_size][static_cast<uint>(mouse_pos.x) / m_cell_size];
+	return m_Cells[mouse_pos.y / m_cell_size][mouse_pos.x / m_cell_size];
 }
 
 void engine::ClearAll()
@@ -82,8 +96,8 @@ void engine::handle_events()
 		case sf::Event::MouseButtonPressed: 
 			if (evnt.mouseButton.button == sf::Mouse::Left)
 			{
-			Cell& cell = mousepos_to_cell(sf::Vector2f(evnt.mouseButton.x, evnt.mouseButton.y));
-			cell.set_status(m_gamerules->on_click_cell(cell));
+				Cell& cell = mousepos_to_cell({ evnt.mouseButton.x, evnt.mouseButton.y });
+			cell.set_status(m_game->on_click_cell(cell));
 			}
 			break;
 		case sf::Event::KeyPressed:
@@ -108,9 +122,9 @@ void engine::switch_pause()
 
 void engine::update_cells()
 {
-	for (auto y = 0; y < m_Cells.size(); y++)
+	for (size_t y = 0; y < m_Cells.size(); y++)
 	{
-		for (auto x = 0; x < m_Cells[y].size(); x++)
+		for (size_t x = 0; x < m_Cells[y].size(); x++)
 		{
 			m_Cells[y][x].set_status(m_next_status[y][x]);
 		}
@@ -122,7 +136,7 @@ void engine::Update()
 {
 	for(uint y = 0; y < m_Cells.size(); y++)
 		for(uint x = 0; x < m_Cells[y].size(); x++)
-			m_next_status[y][x] = m_gamerules->calc_cell_update(m_Cells[y][x]);
+			m_next_status[y][x] = m_game->calc_cell_update(m_Cells[y][x]);
 	update_cells();
 }
 

@@ -4,7 +4,7 @@
 #include <SFML\Graphics.hpp>
 #include "Cell.h"
 #include "Config.h"
-#include "Base_Gamerules.h"
+#include "Base_game.h"
 #include <memory>
 
 
@@ -16,7 +16,7 @@ public:
 	const Color_lookup m_color_lookup;
 
 private:
-	std::unique_ptr<Base_gamerules> m_gamerules;
+	std::unique_ptr<Base_game> m_game;
 	Config m_config;
 	sf::RectangleShape m_FieldShape;
 	
@@ -32,14 +32,14 @@ private:
 
 	void update_cells();
 	void Update();
-	Cell& mousepos_to_cell(sf::Vector2f mouse_pos);
+	Cell& mousepos_to_cell(sf::Vector2i mouse_pos);
 	const sf::RectangleShape& getShape() const;
 	void ClearAll();
 	void handle_events();
 	void switch_pause();
 
 public:
-	engine(std::unique_ptr<Base_gamerules> gamerules, const Config& config = Config());
+	engine(std::unique_ptr<Base_game> game, const Config& config = Config());
 	
 	void Run();
 

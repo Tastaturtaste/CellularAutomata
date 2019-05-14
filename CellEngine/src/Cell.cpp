@@ -8,7 +8,7 @@ Cell::Cell(sf::Vector2u idx, const sf::RectangleShape& cell_shape, uint status, 
 	m_body.setFillColor(r_color_lookup[status]);
 }
 
-void Cell::set_status(uint status)
+void Cell::set_status(const uint status)
 {
 	m_status = status;
 	m_body.setFillColor(r_color_lookup[status]);

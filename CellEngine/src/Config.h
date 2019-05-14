@@ -10,10 +10,10 @@ struct Config {
 	std::string title = "title";
 	sf::Color background_color = sf::Color::Black;
 	sf::Color cellboarder_color = sf::Color::Red;
-	std::vector<sf::Color> color_lookup = { sf::Color::Transparent, sf::Color::Yellow }; // 0 == dead, 1 == alive
 	float cellboarder_percentage = 0.05f;
 	uint cell_size = 20;
 	sf::Time epoch_time = sf::milliseconds(500);
+	bool fullscreen = true;
 	point topleft = { 0,0 };
 	point botright = { 1200,800 };
 	uint framerate_limit = 60;
