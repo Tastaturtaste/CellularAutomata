@@ -173,12 +173,10 @@
     <ClInclude Include="src\Cell.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\engine.h" />
-    <ClInclude Include="src\Input.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Cell.cpp" />
     <ClCompile Include="src\engine.cpp" />
-    <ClCompile Include="src\Input.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
