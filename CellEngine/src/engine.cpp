@@ -3,6 +3,9 @@
 #include <iostream>
 #include <algorithm>
 #include <unordered_set>
+#include <chrono>
+#include <thread>
+
 
 #define LOG(x) std::cout << x << "\n"
 
@@ -46,11 +49,16 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 	}
 	m_next_status.resize(m_Cells.size());
 	std::for_each(std::begin(m_next_status), std::end(m_next_status), [&](auto& vec) {vec.resize(m_Cells[0].size()); });
+	connect_cells();
+}
+
+void engine::connect_cells()
+{
 	/*
 	connect cells so they know what their neighbors are
 	0 1 2
-	3	4
-	5 6 7
+	7	3
+	6 5 4
 	*/
 	for (uint y = 0; y < m_Cells.size(); y++)
 	{
@@ -58,15 +66,15 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 		{
 			auto& cell = m_Cells[y][x];
 
-			y > 0 && x > 0 ? cell.m_neighbors[0] = &m_Cells[y - 1][x - 1] : cell.m_neighbors[0] = &border_cell;
-			y > 0 ? cell.m_neighbors[1] = &m_Cells[y - 1][x] : cell.m_neighbors[1] = &border_cell;
-			y > 0 && x < m_Cells[y].size() - 1 ? cell.m_neighbors[2] = &m_Cells[y - 1][x + 1] : cell.m_neighbors[2] = &border_cell;
-			x > 0 ? cell.m_neighbors[3] = &m_Cells[y][x - 1] : cell.m_neighbors[3] = &border_cell;
-			x < m_Cells[y].size() - 1 ? cell.m_neighbors[4] = &m_Cells[y][x + 1] : cell.m_neighbors[4] = &border_cell;
-			y < m_Cells.size() - 1 && x > 0 ? cell.m_neighbors[5] = &m_Cells[y + 1][x - 1] : cell.m_neighbors[5] = &border_cell;
-			y < m_Cells.size() - 1 ? cell.m_neighbors[6] = &m_Cells[y + 1][x] : cell.m_neighbors[6] = &border_cell;
-			y < m_Cells.size() - 1 && x < m_Cells[y].size() - 1 ? cell.m_neighbors[7] = &m_Cells[y + 1][x + 1] : cell.m_neighbors[7] = &border_cell;
-
+			
+			y > 0 ? cell.m_neighbors[0] = &m_Cells[y - 1][x] : cell.m_neighbors[0] = &border_cell;															//0
+			y > 0 && x < m_Cells[y].size() - 1? cell.m_neighbors[1] = &m_Cells[y - 1][x + 1] : cell.m_neighbors[1] = &border_cell;							//1
+			x < m_Cells[y].size() - 1 ? cell.m_neighbors[2] = &m_Cells[y][x + 1] : cell.m_neighbors[2] = &border_cell;										//2
+			y < m_Cells.size() - 1 && x < m_Cells[y].size() - 1 ? cell.m_neighbors[3] = &m_Cells[y + 1][x + 1] : cell.m_neighbors[3] = &border_cell;		//3
+			y < m_Cells.size() - 1 ? cell.m_neighbors[4] = &m_Cells[y + 1][x] : cell.m_neighbors[4] = &border_cell;											//4
+			y < m_Cells.size() - 1 && x > 0 ? cell.m_neighbors[5] = &m_Cells[y + 1][x - 1] : cell.m_neighbors[5] = &border_cell;							//5
+			x > 0 ? cell.m_neighbors[6] = &m_Cells[y][x - 1] : cell.m_neighbors[6] = &border_cell;															//6
+			y > 0 && x > 0 ? cell.m_neighbors[7] = &m_Cells[y - 1][x - 1] : cell.m_neighbors[7] = &border_cell;												//7
 		}
 	}
 }
@@ -139,21 +147,23 @@ void engine::switch_pause()
 
 void engine::draw()
 {
-	sf::Time frame_time = sf::milliseconds(1000) / max_fps;
-	sf::Clock draw_clock;
+	using namespace std::chrono_literals;
+	std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(1s) / static_cast<uint64_t>(max_fps);
+	std::chrono::steady_clock draw_clock;
+	std::chrono::time_point last_draw = draw_clock.now() - frame_time;
 	m_window.setActive(true);
 	while (game_running)
 	{
-		//sf::Lock lock(mut_window);
 		m_window.clear(sf::Color::White);
 		m_window.draw(m_FieldShape);
 		for (const auto& row : m_Cells)
 			for (const auto& cell : row)
 				m_window.draw(cell.get_shape());
-	//sf::sleep(frame_time - draw_clock.getElapsedTime());
-		//sf::Lock lock(mut_window);
+
+		if (draw_clock.now() - last_draw < frame_time)
+			continue;
 		m_window.display();
-		draw_clock.restart();
+		last_draw = draw_clock.now();
 	}
 	m_window.setActive(false);
 }
@@ -180,30 +190,25 @@ void engine::Update()
 
 void engine::Run()
 {
-	sf::Clock timer;
-	timer.restart();
-	
 	m_window.setActive(false);
-	sf::Thread draw_thread = sf::Thread(&engine::draw, this);
-	draw_thread.launch();
+	std::thread draw_thread(&engine::draw, this);
 
-	sf::Time last_update = timer.restart();
-	sf::Time deltaTime;
+	std::chrono::steady_clock update_timer;
+	std::chrono::time_point last_update = update_timer.now();
 	while (game_running)
 	{
 		if (!is_paused)
 		{
-			deltaTime = timer.getElapsedTime() - last_update;
-			if (deltaTime > m_config.epoch_time)
+			if (update_timer.now() - last_update > m_config.epoch_time)
 			{
 				Update();
-				last_update = timer.getElapsedTime();
+				last_update = update_timer.now();
 			}
 		}
-		
+
 		handle_events();
 	}
-	//sf::Lock lock(mut_window);
+	draw_thread.join();
 	m_window.close();
 }
 

@@ -10,7 +10,7 @@ class Base_game {
 protected:
 	using uint = unsigned int;
 
-	std::string title = "title";
+	std::string title;
 	std::vector<sf::Color> color_lookup;
 
 public:

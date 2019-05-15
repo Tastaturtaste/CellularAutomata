@@ -19,6 +19,11 @@ private:
 
 public:
 	const sf::Vector2u m_idx = { 0,0 }; //{x,y}
+	/*
+	0 1 2
+	7	3
+	6 5 4
+	*/
 	std::array<const Cell*, 8> m_neighbors{ nullptr };
 
 	Cell(sf::Vector2u idx, const sf::RectangleShape& cell_shape, uint status, const std::vector<sf::Color>& color_lookup);

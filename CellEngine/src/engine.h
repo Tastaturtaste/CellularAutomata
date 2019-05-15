@@ -33,6 +33,8 @@ private:
 	const float max_fps = static_cast<float>(m_config.framerate_limit);
 	sf::Mutex mut_window;
 
+
+	void connect_cells();
 	void update_cells();
 	void Update();
 	Cell& mousepos_to_cell(sf::Vector2i mouse_pos);
