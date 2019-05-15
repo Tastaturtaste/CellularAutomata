@@ -14,6 +14,7 @@ Base_game::uint Wireworld::calc_cell_update(const Cell & cell) const
 	switch (cell.get_status())
 	{
 	case Cell_status::isolator: 
+		return Cell_status::isolator;
 		break;
 	case Cell_status::conductor: 
 		for (auto iter = std::begin(cell.m_neighbors); iter < std::end(cell.m_neighbors); iter += step)
