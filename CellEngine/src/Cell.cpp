@@ -3,19 +3,27 @@
 
 #include <numeric>
 
-Cell::Cell(sf::Vector2u idx, const sf::RectangleShape& cell_shape, uint status, const std::vector<sf::Color>& color_lookup)
-	: m_body(cell_shape), m_status(status), r_color_lookup(color_lookup), m_idx(idx)
+Cell::Cell(sf::Vector2u idx, uint cell_size, float border_percentage, uint status, const std::vector<sf::Color>& color_lookup)
+	: m_status(status), r_color_lookup(color_lookup), m_idx(idx)
 {
-	m_body.setFillColor(r_color_lookup[status]);
+	float pixelX = idx.x * cell_size + cell_size * (border_percentage / 2);
+	float pixelY = idx.y * cell_size + cell_size * (border_percentage / 2);
+	float core_size = cell_size * (1.f - border_percentage);
+	m_vertices[0].position = { pixelX				,	pixelY };
+	m_vertices[1].position = { pixelX + core_size	,	pixelY };
+	m_vertices[2].position = { pixelX + core_size	,	pixelY + core_size };
+	m_vertices[3].position = { pixelX				,	pixelY + core_size };
+	set_color(m_status);
 }
 
 void Cell::set_status(const uint status)
 {
 	m_status = status;
-	m_body.setFillColor(r_color_lookup[status]);
+	set_color(status);
 }
 
 const Cell::uint Cell::get_status() const
 {
 	return m_status;
 }
+

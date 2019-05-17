@@ -10,45 +10,34 @@
 #define LOG(x) std::cout << x << "\n"
 
 engine::engine(std::unique_ptr<Base_game> game, const Config& config)
-	: m_color_lookup(game->get_color_lookup()), m_game(std::move(game)), m_config(config), m_cell_shape(sf::Vector2f(static_cast<float>(config.cell_size), static_cast<float>(config.cell_size))), border_cell(Cell({ 0u, 0u }, m_cell_shape, 0u, m_color_lookup))
+	: m_color_lookup(game->get_color_lookup()), m_game(std::move(game)), m_config(config), border_cell(Cell({ 0u, 0u }, config.cell_size, config.cellboarder_percentage, 0u, m_color_lookup))
 {
-	//sf::Lock lock(mut_window);
 	if (m_config.fullscreen)
 	{
 		sf::VideoMode videomode = *(sf::VideoMode::getFullscreenModes().begin());
-		m_FieldShape = sf::RectangleShape(sf::Vector2f(static_cast<float>(videomode.width), static_cast<float>(videomode.height)));
-		m_FieldShape.setPosition(sf::Vector2f(0.0f,0.0f));
 
 		m_window.create(videomode, m_game->get_title(), sf::Style::Fullscreen);
 		m_window.setPosition(m_config.topleft);
 	}
 	else
 	{
-		m_FieldShape = sf::RectangleShape(sf::Vector2f(static_cast<float>(m_config.botright.x - m_config.topleft.x), static_cast<float>(m_config.botright.y - m_config.topleft.y)));
-		m_FieldShape.setPosition(static_cast<sf::Vector2f>(m_config.topleft));
-
-		m_window.create(sf::VideoMode(static_cast<uint>(m_FieldShape.getSize().x), static_cast<uint>(m_FieldShape.getSize().y), sf::VideoMode::getDesktopMode().bitsPerPixel), m_game->get_title(), sf::Style::Default ^ sf::Style::Resize);
+		m_window.create(sf::VideoMode(static_cast<uint>(m_config.botright.x), static_cast<uint>(m_config.botright.y), sf::VideoMode::getDesktopMode().bitsPerPixel), m_game->get_title(), sf::Style::Default ^ sf::Style::Resize);
 		m_window.setPosition(m_config.topleft);
 	}
-	m_FieldShape.setFillColor(m_config.background_color);
-	m_window.setFramerateLimit(m_config.framerate_limit);
+	m_window.setFramerateLimit(0);
 	
-	m_cell_shape.setOutlineThickness(-m_config.cellboarder_percentage * m_config.cell_size);
-	m_cell_shape.setOutlineColor(m_config.cellboarder_color);
-	
-	m_Cells.reserve(static_cast<size_t>(m_FieldShape.getSize().y / m_config.cell_size));
-	for (uint y = 0; y < m_FieldShape.getSize().y / m_config.cell_size; y++)
+	m_Cells.reserve(static_cast<size_t>(m_window.getSize().y / m_config.cell_size));
+	for (uint y = 0; y < m_window.getSize().y / m_config.cell_size; y++)
 	{
 		m_Cells.emplace_back(std::vector<Cell>());
-		m_Cells[y].reserve(static_cast<size_t>(m_FieldShape.getSize().x / m_config.cell_size));
-		for (uint x = 0; x < m_FieldShape.getSize().x / m_config.cell_size; x++)
+		m_Cells[y].reserve(static_cast<size_t>(m_window.getSize().x / m_config.cell_size));
+		for (uint x = 0; x < m_window.getSize().x / m_config.cell_size; x++)
 		{
-			m_cell_shape.setPosition(sf::Vector2f(static_cast<float>(x * m_cell_size), static_cast<float>(y * m_cell_size)));
-			m_Cells[y].emplace_back(sf::Vector2u( x, y ), m_cell_shape, 0u, m_color_lookup);
+			m_Cells[y].emplace_back(sf::Vector2u( x, y ), m_cell_size, m_config.cellboarder_percentage, 0u, m_color_lookup);
 		}
 	}
 	m_next_status.resize(m_Cells.size());
-	std::for_each(std::begin(m_next_status), std::end(m_next_status), [&](auto& vec) {vec.resize(m_Cells[0].size()); });
+	std::for_each(std::begin(m_next_status), std::end(m_next_status), [&](auto& vec) { vec.resize(m_Cells[0].size()); });
 	connect_cells();
 }
 
@@ -77,11 +66,6 @@ void engine::connect_cells()
 			y > 0 && x > 0 ? cell.m_neighbors[7] = &m_Cells[y - 1][x - 1] : cell.m_neighbors[7] = &border_cell;												//7
 		}
 	}
-}
-
-const sf::RectangleShape& engine::getShape() const
-{
-	return m_FieldShape;
 }
 
 Cell & engine::mousepos_to_cell(sf::Vector2i mouse_pos)
@@ -126,7 +110,6 @@ void engine::mouse_input()
 {
 	static std::unordered_set<const Cell*> cells;
 	static Cell* current_cell;
-	//sf::Lock lock(mut_window);
 	while (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		current_cell = &mousepos_to_cell(sf::Mouse::getPosition(m_window));
@@ -148,20 +131,42 @@ void engine::switch_pause()
 void engine::draw()
 {
 	using namespace std::chrono_literals;
-	std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(1s) / static_cast<uint64_t>(max_fps);
-	std::chrono::steady_clock draw_clock;
+	std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(std::chrono::milliseconds(get_time_per_instance(max_fps)));
+	std::chrono::high_resolution_clock draw_clock;
 	std::chrono::time_point last_draw = draw_clock.now() - frame_time;
+	
+		std::chrono::nanoseconds time_since_last_draw = std::chrono::nanoseconds(frame_time);
+		std::chrono::time_point begin_of_debug = draw_clock.now();
+
+		std::vector<sf::Vertex> vertices(m_Cells.size() * m_Cells[0].size() * 4);
+		auto va_it = vertices.begin();
+		sf::VertexBuffer vertex_buffer(sf::Quads);
+		vertex_buffer.create(vertices.size());
+
 	m_window.setActive(true);
 	while (game_running)
 	{
-		m_window.clear(sf::Color::White);
-		m_window.draw(m_FieldShape);
-		for (const auto& row : m_Cells)
-			for (const auto& cell : row)
-				m_window.draw(cell.get_shape());
+		begin_of_debug = draw_clock.now();
+		m_window.clear(m_config.background_color);
+		va_it = vertices.begin();
+		for (auto y = m_Cells.begin(); y < m_Cells.end(); ++y)
+		{
+			for (auto x = y->begin(); x < y->end(); ++x)
+			{
 
-		if (draw_clock.now() - last_draw < frame_time)
-			continue;
+				std::copy(x->get_vertices().begin(), x->get_vertices().end(), va_it);
+				va_it += 4;
+			}
+		}
+		vertex_buffer.update(vertices.data());
+		m_window.draw(vertex_buffer);
+		
+		time_since_last_draw = draw_clock.now() - last_draw;
+		if (time_since_last_draw < frame_time)
+		{
+			std::this_thread::sleep_for(frame_time - time_since_last_draw);
+		}
+
 		m_window.display();
 		last_draw = draw_clock.now();
 	}
@@ -190,13 +195,19 @@ void engine::Update()
 
 void engine::Run()
 {
+	
+
 	m_window.setActive(false);
 	std::thread draw_thread(&engine::draw, this);
 
-	std::chrono::steady_clock update_timer;
+	std::chrono::high_resolution_clock update_timer;
 	std::chrono::time_point last_update = update_timer.now();
+	std::chrono::time_point update_beginning(update_timer.now());
+	std::chrono::milliseconds min_update_time = std::chrono::milliseconds(get_time_per_instance(m_config.min_ups));
+
 	while (game_running)
 	{
+		update_beginning = update_timer.now();
 		if (!is_paused)
 		{
 			if (update_timer.now() - last_update > m_config.epoch_time)
@@ -207,8 +218,14 @@ void engine::Run()
 		}
 
 		handle_events();
+		if(min_update_time < m_config.epoch_time)
+			std::this_thread::sleep_for(min_update_time - std::chrono::duration(update_timer.now() - update_beginning));
+		else
+			std::this_thread::sleep_for(m_config.epoch_time - std::chrono::duration(update_timer.now() - update_beginning));
 	}
 	draw_thread.join();
 	m_window.close();
 }
+
+
 

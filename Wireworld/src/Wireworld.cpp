@@ -25,7 +25,7 @@ Base_game::uint Wireworld::calc_cell_update(const Cell & cell) const
 			}
 		}
 		if (electron_count > 0 && electron_count <= electron_switch) return Cell_status::electron_head;
-		return Cell_status::conductor;
+		else return Cell_status::conductor;
 		break;  
 	case Cell_status::electron_head:
 		return Cell_status::electron_tail;
@@ -51,6 +51,7 @@ Base_game::uint Wireworld::on_click_cell(const Cell & cell) const
 		return Cell_status::isolator;
 		break;
 	case Cell_status::electron_tail:
+		return Cell_status::conductor;
 		break;
 	}
 	static_assert(true, "Cellstatus not handled!\n");

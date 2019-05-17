@@ -19,11 +19,10 @@ public:
 private:
 	std::unique_ptr<Base_game> m_game;
 	Config m_config;
-	sf::RectangleShape m_FieldShape;
+	//sf::RectangleShape m_FieldShape;
 	
 	std::vector<std::vector<Cell>> m_Cells; // rowmajor, m_Cells[y][x]
 	std::vector<std::vector<uint>> m_next_status;
-	sf::RectangleShape m_cell_shape;
 	uint m_cell_size = m_config.cell_size;
 	sf::RenderWindow m_window;
 	Cell border_cell;
@@ -31,14 +30,12 @@ private:
 	bool is_paused = true;
 	bool game_running = true;
 	const float max_fps = static_cast<float>(m_config.framerate_limit);
-	sf::Mutex mut_window;
 
 
 	void connect_cells();
 	void update_cells();
 	void Update();
 	Cell& mousepos_to_cell(sf::Vector2i mouse_pos);
-	const sf::RectangleShape& getShape() const;
 	void ClearAll();
 	void handle_events();
 	void mouse_input();
@@ -52,3 +49,8 @@ public:
 	void Run();
 
 };
+
+constexpr const unsigned int get_time_per_instance(int i)
+{
+	return 1000 / i;
+}
