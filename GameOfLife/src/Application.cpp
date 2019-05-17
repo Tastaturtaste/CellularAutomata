@@ -1,6 +1,8 @@
 #include "GoL.h"
 #include "engine.h"
 #include "Config.h"
+#include "util\Timer.h"
+#include <thread>
 #include <memory>
 
 int main()
