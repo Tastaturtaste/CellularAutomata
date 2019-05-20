@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <ratio>
 
 #include "Cell.h"
 #include "Config.h"
@@ -50,7 +51,10 @@ public:
 
 };
 
-constexpr const unsigned int get_time_per_instance(int i)
+
+//Period has to be of type std::ratio
+template<class Period>
+constexpr const uint64_t get_time_per_instance(int i)
 {
-	return 1000 / i;
+	return Period::den / (Period::num * i);
 }

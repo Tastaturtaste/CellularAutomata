@@ -130,23 +130,19 @@ void engine::switch_pause()
 
 void engine::draw()
 {
-	using namespace std::chrono_literals;
-	std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(std::chrono::milliseconds(get_time_per_instance(max_fps)));
+	std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(max_fps));
 	std::chrono::high_resolution_clock draw_clock;
 	std::chrono::time_point last_draw = draw_clock.now() - frame_time;
 	
-		std::chrono::nanoseconds time_since_last_draw = std::chrono::nanoseconds(frame_time);
-		std::chrono::time_point begin_of_debug = draw_clock.now();
 
-		std::vector<sf::Vertex> vertices(m_Cells.size() * m_Cells[0].size() * 4);
-		auto va_it = vertices.begin();
-		sf::VertexBuffer vertex_buffer(sf::Quads);
-		vertex_buffer.create(vertices.size());
+	std::vector<sf::Vertex> vertices(m_Cells.size() * m_Cells[0].size() * 4);
+	auto va_it = vertices.begin(); // assigned new every loop in case vector resizes
+	sf::VertexBuffer vertex_buffer(sf::Quads);
+	vertex_buffer.create(vertices.size());
 
 	m_window.setActive(true);
 	while (game_running)
 	{
-		begin_of_debug = draw_clock.now();
 		m_window.clear(m_config.background_color);
 		va_it = vertices.begin();
 		for (auto y = m_Cells.begin(); y < m_Cells.end(); ++y)
@@ -160,12 +156,8 @@ void engine::draw()
 		}
 		vertex_buffer.update(vertices.data());
 		m_window.draw(vertex_buffer);
-		
-		time_since_last_draw = draw_clock.now() - last_draw;
-		if (time_since_last_draw < frame_time)
-		{
-			std::this_thread::sleep_for(frame_time - time_since_last_draw);
-		}
+
+		std::this_thread::sleep_until(last_draw + frame_time);
 
 		m_window.display();
 		last_draw = draw_clock.now();
@@ -203,7 +195,7 @@ void engine::Run()
 	std::chrono::high_resolution_clock update_timer;
 	std::chrono::time_point last_update = update_timer.now();
 	std::chrono::time_point update_beginning(update_timer.now());
-	std::chrono::milliseconds min_update_time = std::chrono::milliseconds(get_time_per_instance(m_config.min_ups));
+	std::chrono::nanoseconds min_update_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(m_config.min_ups));
 
 	while (game_running)
 	{
@@ -226,6 +218,7 @@ void engine::Run()
 	draw_thread.join();
 	m_window.close();
 }
+
 
 
 
