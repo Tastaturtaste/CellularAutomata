@@ -10,7 +10,7 @@
 #define LOG(x) std::cout << x << "\n"
 
 engine::engine(std::unique_ptr<Base_game> game, const Config& config)
-	: m_color_lookup(game->get_color_lookup()), m_game(std::move(game)), m_config(config), border_cell(Cell({ 0u, 0u }, config.cell_size, config.cellboarder_percentage, 0u, m_color_lookup))
+	: m_color_lookup(game->get_color_lookup()), m_game(std::move(game)), m_config(config), border_cell(Cell({ 0U, 0U }, config.cell_size, config.cellboarder_percentage, 0U, m_color_lookup))
 {
 	if (m_config.fullscreen)
 	{
@@ -33,7 +33,7 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 		m_Cells[y].reserve(static_cast<size_t>(m_window.getSize().x / m_config.cell_size));
 		for (uint x = 0; x < m_window.getSize().x / m_config.cell_size; x++)
 		{
-			m_Cells[y].emplace_back(sf::Vector2u( x, y ), m_cell_size, m_config.cellboarder_percentage, 0u, m_color_lookup);
+			m_Cells[y].emplace_back(sf::Vector2u( x, y ), m_cell_size, m_config.cellboarder_percentage, 0U, m_color_lookup);
 		}
 	}
 	m_next_status.resize(m_Cells.size());
@@ -75,22 +75,24 @@ Cell & engine::mousepos_to_cell(sf::Vector2i mouse_pos)
 
 void engine::ClearAll()
 {
-	for (auto& vec : m_Cells)
-		for (auto& cell : vec)
+	for (auto& vec : m_Cells) {
+		for (auto& cell : vec) {
 			cell.set_status(0);
+}
+}
 }
 
 void engine::handle_events()
 {
 	sf::Event evnt;
-	//sf::Lock lock(mut_window);
 	while (m_window.pollEvent(evnt))
 	{
 		switch (evnt.type)
 		{
 		case sf::Event::Closed: game_running = false; break;
 		case sf::Event::MouseButtonPressed: 
-			if (evnt.mouseButton.button == sf::Mouse::Left) mouse_input(); break;
+			if (evnt.mouseButton.button == sf::Mouse::Left) { mouse_input(); 
+}break;
 		case sf::Event::KeyPressed:
 			switch (evnt.key.code)
 			{
@@ -131,8 +133,7 @@ void engine::switch_pause()
 void engine::draw()
 {
 	std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(max_fps));
-	std::chrono::high_resolution_clock draw_clock;
-	std::chrono::time_point last_draw = draw_clock.now() - frame_time;
+	std::chrono::time_point last_draw = std::chrono::high_resolution_clock::now() - frame_time;
 	
 
 	std::vector<sf::Vertex> vertices(m_Cells.size() * m_Cells[0].size() * 4);
@@ -160,7 +161,7 @@ void engine::draw()
 		std::this_thread::sleep_until(last_draw + frame_time);
 
 		m_window.display();
-		last_draw = draw_clock.now();
+		last_draw = std::chrono::high_resolution_clock::now();
 	}
 	m_window.setActive(false);
 }
@@ -174,14 +175,15 @@ void engine::update_cells()
 			m_Cells[y][x].set_status(m_next_status[y][x]);
 		}
 	}
-	return;
-}
+	}
 
 void engine::Update()
 {
-	for(uint y = 0; y < m_Cells.size(); y++)
-		for(uint x = 0; x < m_Cells[y].size(); x++)
+	for(uint y = 0; y < m_Cells.size(); y++) {
+		for(uint x = 0; x < m_Cells[y].size(); x++) {
 			m_next_status[y][x] = m_game->calc_cell_update(m_Cells[y][x]);
+}
+}
 	update_cells();
 }
 
@@ -192,28 +194,28 @@ void engine::Run()
 	m_window.setActive(false);
 	std::thread draw_thread(&engine::draw, this);
 
-	std::chrono::high_resolution_clock update_timer;
-	std::chrono::time_point last_update = update_timer.now();
-	std::chrono::time_point update_beginning(update_timer.now());
+	std::chrono::time_point last_update = std::chrono::high_resolution_clock::now();
+	std::chrono::time_point update_beginning(std::chrono::high_resolution_clock::now());
 	std::chrono::nanoseconds min_update_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(m_config.min_ups));
 
 	while (game_running)
 	{
-		update_beginning = update_timer.now();
+		update_beginning = std::chrono::high_resolution_clock::now();
 		if (!is_paused)
 		{
-			if (update_timer.now() - last_update > m_config.epoch_time)
+			if (std::chrono::high_resolution_clock::now() - last_update > m_config.epoch_time)
 			{
 				Update();
-				last_update = update_timer.now();
+				last_update = std::chrono::high_resolution_clock::now();
 			}
 		}
 
 		handle_events();
-		if(min_update_time < m_config.epoch_time)
-			std::this_thread::sleep_for(min_update_time - std::chrono::duration(update_timer.now() - update_beginning));
-		else
-			std::this_thread::sleep_for(m_config.epoch_time - std::chrono::duration(update_timer.now() - update_beginning));
+		if(min_update_time < m_config.epoch_time) {
+			std::this_thread::sleep_for(min_update_time - std::chrono::duration(std::chrono::high_resolution_clock::now() - update_beginning));
+		} else {
+			std::this_thread::sleep_for(m_config.epoch_time - std::chrono::duration(std::chrono::high_resolution_clock::now() - update_beginning));
+}
 	}
 	draw_thread.join();
 	m_window.close();

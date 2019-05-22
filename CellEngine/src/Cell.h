@@ -19,8 +19,9 @@ private:
 	std::array<sf::Vertex,4> m_vertices;
 
 	inline void set_color(uint status) {
-		for (auto& vertex : m_vertices)
+		for (auto& vertex : m_vertices) {
 			vertex.color = r_color_lookup[status];
+}
 	}
 
 public:
@@ -34,6 +35,6 @@ public:
 
 	Cell(sf::Vector2u idx, uint cell_size, float border_size, uint status, const std::vector<sf::Color>& color_lookup);
 	inline const std::array<sf::Vertex,4>& get_vertices() const { return m_vertices; };
-	void set_status(const uint status);
+	void set_status(uint status);
 	const Cell::uint get_status() const;
 };

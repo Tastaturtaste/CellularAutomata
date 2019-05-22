@@ -13,7 +13,7 @@ struct Config {
 
 	std::string title = "title";
 	sf::Color background_color = sf::Color::Black;
-	float cellboarder_percentage = 0.05f;
+	float cellboarder_percentage = 0.05F;
 	uint cell_size = 20;
 	std::chrono::milliseconds epoch_time = std::chrono::milliseconds(200);
 	uint min_ups = 20;

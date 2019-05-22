@@ -30,7 +30,7 @@ private:
 	
 	bool is_paused = true;
 	bool game_running = true;
-	const float max_fps = static_cast<float>(m_config.framerate_limit);
+	const uint32_t max_fps = m_config.framerate_limit;
 
 
 	void connect_cells();
@@ -54,7 +54,7 @@ public:
 
 //Period has to be of type std::ratio
 template<class Period>
-constexpr const uint64_t get_time_per_instance(int i)
+constexpr uint64_t get_time_per_instance(int i)
 {
 	return Period::den / (Period::num * i);
 }
