@@ -3,8 +3,9 @@
 
 Wireworld::Wireworld()
 {
+	const auto default_background = sf::Color({ 125,100,50,255 });
 	Base_game::title = "Wireworld"; 
-	Base_game::color_lookup = { sf::Color({ 125,100,50,255 }),  sf::Color::Yellow, sf::Color::Red, sf::Color::Blue };
+	Base_game::color_lookup = { default_background,  sf::Color::Yellow, sf::Color::Red, sf::Color::Blue };
 }
 
 Base_game::uint Wireworld::calc_cell_update(const Cell & cell) const

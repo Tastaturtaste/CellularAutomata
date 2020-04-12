@@ -1,10 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2042
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{953EA8A6-5F53-4310-B3FD-F044ED4CCC4A}"
 	ProjectSection(SolutionItems) = preProject
+		.clang-tidy = .clang-tidy
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject

@@ -10,11 +10,11 @@ private:
 
 public:
 	Wireworld();
-	virtual ~Wireworld() final = default;
+	~Wireworld() final = default;
 
-	virtual const std::vector<sf::Color>& get_color_lookup() const final { return Base_game::color_lookup; };
-	virtual const std::string& get_title() const final { return Base_game::title; };
-	virtual uint calc_cell_update(const Cell& cell) const final;
-	virtual uint on_click_cell(const Cell& cell) const final;
+	const std::vector<sf::Color>& get_color_lookup() const final { return Base_game::color_lookup; };
+	const std::string& get_title() const final { return Base_game::title; };
+	uint calc_cell_update(const Cell& cell) const final;
+	uint on_click_cell(const Cell& cell) const final;
 };
 
