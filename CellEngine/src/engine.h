@@ -33,14 +33,14 @@ private:
 	const uint32_t max_fps = m_config.framerate_limit;
 
 
-	void connect_cells();
-	void update_cells();
+	void connect_cells() noexcept;
+	void update_cells() noexcept;
 	void Update();
-	Cell& mousepos_to_cell(sf::Vector2i mouse_pos);
-	void ClearAll();
+	Cell& mousepos_to_cell(sf::Vector2i mouse_pos) noexcept;
+	void ClearAll() noexcept;
 	void handle_events();
 	void mouse_input();
-	void switch_pause();
+	void switch_pause() noexcept;
 	void draw();
 	
 

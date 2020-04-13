@@ -41,7 +41,7 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 	connect_cells();
 }
 
-void engine::connect_cells()
+void engine::connect_cells() noexcept 
 {
 	/*
 	connect cells so they know what their neighbors are
@@ -68,12 +68,12 @@ void engine::connect_cells()
 	}
 }
 
-Cell & engine::mousepos_to_cell(sf::Vector2i mouse_pos)
+Cell & engine::mousepos_to_cell(sf::Vector2i mouse_pos) noexcept
 {
 	return m_Cells[mouse_pos.y / m_cell_size][mouse_pos.x / m_cell_size];
 }
 
-void engine::ClearAll()
+void engine::ClearAll() noexcept
 {
 	for (auto& vec : m_Cells) {
 		for (auto& cell : vec) {
@@ -125,14 +125,14 @@ void engine::mouse_input()
 	current_cell = nullptr;
 }
 
-void engine::switch_pause()
+void engine::switch_pause() noexcept 
 {
 	is_paused = !is_paused;
 }
 
 void engine::draw()
 {
-	std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(max_fps));
+	const std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(max_fps));
 	std::chrono::time_point last_draw = std::chrono::high_resolution_clock::now() - frame_time;
 	
 
@@ -166,7 +166,7 @@ void engine::draw()
 	m_window.setActive(false);
 }
 
-void engine::update_cells()
+void engine::update_cells() noexcept
 {
 	for (size_t y = 0; y < m_Cells.size(); y++)
 	{
@@ -196,7 +196,7 @@ void engine::Run()
 
 	std::chrono::time_point last_update = std::chrono::high_resolution_clock::now();
 	std::chrono::time_point update_beginning(std::chrono::high_resolution_clock::now());
-	std::chrono::nanoseconds min_update_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(m_config.min_ups));
+	const std::chrono::nanoseconds min_update_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(m_config.min_ups));
 
 	while (game_running)
 	{

@@ -18,7 +18,7 @@ private:
 	const std::vector<sf::Color>& r_color_lookup;
 	std::array<sf::Vertex,4> m_vertices;
 
-	inline void set_color(uint status) {
+	inline void set_color(uint status) noexcept {
 		for (auto& vertex : m_vertices) {
 			vertex.color = r_color_lookup[status];
 }
@@ -34,7 +34,7 @@ public:
 	std::array<const Cell*, 8> m_neighbors{ nullptr };
 
 	Cell(sf::Vector2u idx, uint cell_size, float border_size, uint status, const std::vector<sf::Color>& color_lookup);
-	inline const std::array<sf::Vertex,4>& get_vertices() const { return m_vertices; };
-	void set_status(uint status);
-	const Cell::uint get_status() const;
+	inline const std::array<sf::Vertex,4>& get_vertices() const noexcept { return m_vertices; };
+	void set_status(uint status) noexcept;
+	const Cell::uint get_status() const noexcept;
 };

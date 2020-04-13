@@ -15,11 +15,9 @@ private:
 
 public:
 
-	GoL() { Base_game::title = "Game of Life"; Base_game::color_lookup = { {0,70,0,255}, sf::Color::Yellow }; };
-	virtual ~GoL() final = default;
+	GoL() final;
+	~GoL() final = default;
 	
-	virtual const std::vector<sf::Color>& get_color_lookup() const final;
-	virtual const std::string& get_title() const final;
-	virtual uint calc_cell_update(const Cell& cell) const final;
-	virtual uint on_click_cell(const Cell& cell) const final;
+	uint calc_cell_update(const Cell& cell) const final;
+	uint on_click_cell(const Cell& cell) const final;
 };

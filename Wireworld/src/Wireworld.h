@@ -12,8 +12,6 @@ public:
 	Wireworld();
 	~Wireworld() final = default;
 
-	const std::vector<sf::Color>& get_color_lookup() const final { return Base_game::color_lookup; };
-	const std::string& get_title() const final { return Base_game::title; };
 	uint calc_cell_update(const Cell& cell) const final;
 	uint on_click_cell(const Cell& cell) const final;
 };

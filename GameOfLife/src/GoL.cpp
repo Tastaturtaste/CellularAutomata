@@ -3,6 +3,11 @@
 
 #include <numeric>
 
+GoL::GoL() { 
+	set_title("Game of Life");
+	set_color_lookup({ {0,70,0,255}, sf::Color::Yellow });
+}
+
 GoL::uint const GoL::check_reproduce(const Cell & cell) const
 {
 	uint neighbors = std::accumulate(std::begin(cell.m_neighbors), std::end(cell.m_neighbors), 0u, [](uint a, const Cell* const p_cell) {return a + p_cell->get_status(); });
@@ -13,16 +18,6 @@ GoL::uint const GoL::check_sustain(const Cell& cell) const
 {
 	uint neighbors = std::accumulate(std::begin(cell.m_neighbors), std::end(cell.m_neighbors), 0u, [](uint a, const Cell* const p_cell) {return a + p_cell->get_status(); });
 	return neighbors <= max_sustain_neighbors && neighbors >= min_sustain_neighbors ? 1u : 0u;
-}
-
-const std::vector<sf::Color>& GoL::get_color_lookup() const
-{
-	return Base_game::color_lookup;
-}
-
-const std::string& GoL::get_title() const
-{
-	return Base_game::title;
 }
 
 GoL::uint GoL::calc_cell_update(const Cell & cell) const
