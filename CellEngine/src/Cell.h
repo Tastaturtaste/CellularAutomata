@@ -23,18 +23,19 @@ private:
 			vertex.color = r_color_lookup[status];
 }
 	}
+	const sf::Vector2u m_idx = { 0,0 }; //{x,y}
 
 public:
-	const sf::Vector2u m_idx = { 0,0 }; //{x,y}
 	/*
 	0 1 2
 	7	3
 	6 5 4
 	*/
 	std::array<const Cell*, 8> m_neighbors{ nullptr };
-
+	[[nodiscard]] inline auto get_index() const noexcept { return m_idx; }
+	inline void set_index() = delete;
 	Cell(sf::Vector2u idx, uint cell_size, float border_size, uint status, const std::vector<sf::Color>& color_lookup);
-	inline const std::array<sf::Vertex,4>& get_vertices() const noexcept { return m_vertices; };
+	[[nodiscard]] inline auto get_vertices() const noexcept -> const std::array<sf::Vertex,4>& { return m_vertices; };
 	void set_status(uint status) noexcept;
-	const Cell::uint get_status() const noexcept;
+	[[nodiscard]] auto get_status() const noexcept -> const Cell::uint;
 };

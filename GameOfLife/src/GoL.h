@@ -2,7 +2,7 @@
 #include "Base_game.h"
 
 
-class GoL : public Base_game{
+class GoL final : public Base_game{
 private:
 	using uint = unsigned int;
 	uint max_sustain_neighbors = 3;
@@ -15,7 +15,7 @@ private:
 
 public:
 
-	GoL() final;
+	GoL() ;
 	~GoL() final = default;
 	
 	uint calc_cell_update(const Cell& cell) const final;

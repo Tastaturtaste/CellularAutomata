@@ -7,7 +7,7 @@
 #include <thread>
 
 
-#define LOG(x) std::cout << x << "\n"
+#define LOG(x) std::cout << (x) << "\n"
 
 engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 	: m_color_lookup(game->get_color_lookup()), m_game(std::move(game)), m_config(config), border_cell(Cell({ 0U, 0U }, config.cell_size, config.cellboarder_percentage, 0U, m_color_lookup))
@@ -68,7 +68,7 @@ void engine::connect_cells() noexcept
 	}
 }
 
-Cell & engine::mousepos_to_cell(sf::Vector2i mouse_pos) noexcept
+auto engine::mousepos_to_cell(sf::Vector2i mouse_pos) noexcept -> Cell &
 {
 	return m_Cells[mouse_pos.y / m_cell_size][mouse_pos.x / m_cell_size];
 }
@@ -84,7 +84,7 @@ void engine::ClearAll() noexcept
 
 void engine::handle_events()
 {
-	sf::Event evnt;
+	sf::Event evnt{};
 	while (m_window.pollEvent(evnt))
 	{
 		switch (evnt.type)

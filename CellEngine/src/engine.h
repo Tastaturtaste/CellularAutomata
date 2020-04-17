@@ -36,7 +36,7 @@ private:
 	void connect_cells() noexcept;
 	void update_cells() noexcept;
 	void Update();
-	Cell& mousepos_to_cell(sf::Vector2i mouse_pos) noexcept;
+	auto mousepos_to_cell(sf::Vector2i mouse_pos) noexcept -> Cell&;
 	void ClearAll() noexcept;
 	void handle_events();
 	void mouse_input();
@@ -54,7 +54,7 @@ public:
 
 //Period has to be of type std::ratio
 template<class Period>
-constexpr uint64_t get_time_per_instance(int i)
+constexpr auto get_time_per_instance(int i) -> uint64_t
 {
 	return Period::den / (Period::num * i);
 }

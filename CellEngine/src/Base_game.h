@@ -19,8 +19,8 @@ public:
 	
 	virtual ~Base_game() = default;
 
-	virtual const std::vector<sf::Color>& get_color_lookup() const noexcept { return color_lookup; }
-	virtual const std::string& get_title() const noexcept { return title; }
-	virtual uint calc_cell_update(const Cell& cell) const = 0;
-	virtual uint on_click_cell(const Cell& cell) const = 0;
+	[[nodiscard]] virtual auto get_color_lookup() const noexcept -> const std::vector<sf::Color>& { return color_lookup; }
+	[[nodiscard]] virtual auto get_title() const noexcept -> const std::string& { return title; }
+	[[nodiscard]] virtual auto calc_cell_update(const Cell& cell) const -> uint = 0;
+	[[nodiscard]] virtual auto on_click_cell(const Cell& cell) const -> uint = 0;
 };

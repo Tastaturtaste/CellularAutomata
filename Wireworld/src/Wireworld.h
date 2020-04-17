@@ -2,7 +2,7 @@
 
 #include "Base_game.h"
 
-class Wireworld : public Base_game {
+class Wireworld final : public Base_game {
 private:
 	enum Cell_status : uint {isolator = 0, conductor = 1, electron_head = 2, electron_tail = 3};
 	uint8_t electron_switch = 2;

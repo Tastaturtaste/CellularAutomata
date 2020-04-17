@@ -1,1 +1,1 @@
-Checks: '*,-fuchsia-default-arguments-*'
+Checks: 'clang-analyzer-*,bugprone-*,cppcoreguidelines-*,modernize-*'
