@@ -75,11 +75,13 @@
     <OutDir>$(SolutionDir)$(ProjectName)\Out\$(Configuration)\</OutDir>
     <IntDir>temp\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformTarget)</TargetName>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)Dependencies/SFML/include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(ProjectName)\Out\$(Configuration)\</OutDir>
     <IntDir>temp\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformTarget)</TargetName>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)Dependencies/SFML/include;</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(ProjectName)\Out\$(Configuration)\</OutDir>
@@ -97,7 +99,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\SFML\include\;$(SolutionDir)CellEngine\src;$(SolutionDir)CellEngine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)CellEngine\src;$(SolutionDir)CellEngine</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -126,7 +128,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\SFML\include\;$(SolutionDir)CellEngine\src;$(SolutionDir)CellEngine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)CellEngine\src;$(SolutionDir)CellEngine</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
