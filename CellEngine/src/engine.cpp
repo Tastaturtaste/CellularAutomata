@@ -6,7 +6,6 @@
 #include <chrono>
 #include <thread>
 
-
 #define LOG(x) std::cout << (x) << "\n"
 
 engine::engine(std::unique_ptr<Base_game> game, const Config& config)
@@ -14,7 +13,7 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 {
 	if (m_config.fullscreen)
 	{
-		sf::VideoMode videomode = *(sf::VideoMode::getFullscreenModes().begin());
+		sf::VideoMode videomode{ *(sf::VideoMode::getFullscreenModes().begin()) };
 
 		m_window.create(videomode, m_game->get_title(), sf::Style::Fullscreen);
 		m_window.setPosition(m_config.topleft);
@@ -25,7 +24,7 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 		m_window.setPosition(m_config.topleft);
 	}
 	m_window.setFramerateLimit(0);
-	
+
 	m_Cells.reserve(static_cast<size_t>(m_window.getSize().y / m_config.cell_size));
 	for (uint y = 0; y < m_window.getSize().y / m_config.cell_size; y++)
 	{
@@ -33,7 +32,7 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 		m_Cells[y].reserve(static_cast<size_t>(m_window.getSize().x / m_config.cell_size));
 		for (uint x = 0; x < m_window.getSize().x / m_config.cell_size; x++)
 		{
-			m_Cells[y].emplace_back(sf::Vector2u( x, y ), m_cell_size, m_config.cellboarder_percentage, 0U, m_color_lookup);
+			m_Cells[y].emplace_back(sf::Vector2u(x, y), m_cell_size, m_config.cellboarder_percentage, 0U, m_color_lookup);
 		}
 	}
 	m_next_status.resize(m_Cells.size());
@@ -41,7 +40,7 @@ engine::engine(std::unique_ptr<Base_game> game, const Config& config)
 	connect_cells();
 }
 
-void engine::connect_cells() noexcept 
+void engine::connect_cells() noexcept
 {
 	/*
 	connect cells so they know what their neighbors are
@@ -55,9 +54,8 @@ void engine::connect_cells() noexcept
 		{
 			auto& cell = m_Cells[y][x];
 
-			
 			y > 0 ? cell.m_neighbors[0] = &m_Cells[y - 1][x] : cell.m_neighbors[0] = &border_cell;															//0
-			y > 0 && x < m_Cells[y].size() - 1? cell.m_neighbors[1] = &m_Cells[y - 1][x + 1] : cell.m_neighbors[1] = &border_cell;							//1
+			y > 0 && x < m_Cells[y].size() - 1 ? cell.m_neighbors[1] = &m_Cells[y - 1][x + 1] : cell.m_neighbors[1] = &border_cell;							//1
 			x < m_Cells[y].size() - 1 ? cell.m_neighbors[2] = &m_Cells[y][x + 1] : cell.m_neighbors[2] = &border_cell;										//2
 			y < m_Cells.size() - 1 && x < m_Cells[y].size() - 1 ? cell.m_neighbors[3] = &m_Cells[y + 1][x + 1] : cell.m_neighbors[3] = &border_cell;		//3
 			y < m_Cells.size() - 1 ? cell.m_neighbors[4] = &m_Cells[y + 1][x] : cell.m_neighbors[4] = &border_cell;											//4
@@ -68,7 +66,7 @@ void engine::connect_cells() noexcept
 	}
 }
 
-auto engine::mousepos_to_cell(sf::Vector2i mouse_pos) noexcept -> Cell &
+auto engine::mousepos_to_cell(sf::Vector2i mouse_pos) noexcept -> Cell&
 {
 	return m_Cells[mouse_pos.y / m_cell_size][mouse_pos.x / m_cell_size];
 }
@@ -78,8 +76,8 @@ void engine::ClearAll() noexcept
 	for (auto& vec : m_Cells) {
 		for (auto& cell : vec) {
 			cell.set_status(0);
-}
-}
+		}
+	}
 }
 
 void engine::handle_events()
@@ -90,9 +88,10 @@ void engine::handle_events()
 		switch (evnt.type)
 		{
 		case sf::Event::Closed: game_running = false; break;
-		case sf::Event::MouseButtonPressed: 
-			if (evnt.mouseButton.button == sf::Mouse::Left) { mouse_input(); 
-}break;
+		case sf::Event::MouseButtonPressed:
+			if (evnt.mouseButton.button == sf::Mouse::Left) {
+				mouse_input();
+			}break;
 		case sf::Event::KeyPressed:
 			switch (evnt.key.code)
 			{
@@ -125,7 +124,7 @@ void engine::mouse_input()
 	current_cell = nullptr;
 }
 
-void engine::switch_pause() noexcept 
+void engine::switch_pause() noexcept
 {
 	is_paused = !is_paused;
 }
@@ -134,9 +133,8 @@ void engine::draw()
 {
 	const std::chrono::nanoseconds frame_time = std::chrono::nanoseconds(get_time_per_instance<std::nano>(max_fps));
 	std::chrono::time_point last_draw = std::chrono::high_resolution_clock::now() - frame_time;
-	
 
-	std::vector<sf::Vertex> vertices(m_Cells.size() * m_Cells[0].size() * 4);
+	std::vector<sf::Vertex> vertices = std::vector<sf::Vertex>(m_Cells.size() * m_Cells[0].size() * 4);
 	auto va_it = vertices.begin(); // assigned new every loop in case vector resizes
 	sf::VertexBuffer vertex_buffer(sf::Quads);
 	vertex_buffer.create(vertices.size());
@@ -150,7 +148,6 @@ void engine::draw()
 		{
 			for (auto x = y->begin(); x < y->end(); ++x)
 			{
-
 				std::copy(x->get_vertices().begin(), x->get_vertices().end(), va_it);
 				va_it += 4;
 			}
@@ -175,22 +172,20 @@ void engine::update_cells() noexcept
 			m_Cells[y][x].set_status(m_next_status[y][x]);
 		}
 	}
-	}
+}
 
 void engine::Update()
 {
-	for(uint y = 0; y < m_Cells.size(); y++) {
-		for(uint x = 0; x < m_Cells[y].size(); x++) {
+	for (uint y = 0; y < m_Cells.size(); y++) {
+		for (uint x = 0; x < m_Cells[y].size(); x++) {
 			m_next_status[y][x] = m_game->calc_cell_update(m_Cells[y][x]);
-}
-}
+		}
+	}
 	update_cells();
 }
 
 void engine::Run()
 {
-	
-
 	m_window.setActive(false);
 	std::thread draw_thread(&engine::draw, this);
 
@@ -211,16 +206,13 @@ void engine::Run()
 		}
 
 		handle_events();
-		if(min_update_time < m_config.epoch_time) {
+		if (min_update_time < m_config.epoch_time) {
 			std::this_thread::sleep_for(min_update_time - std::chrono::duration(std::chrono::high_resolution_clock::now() - update_beginning));
-		} else {
+		}
+		else {
 			std::this_thread::sleep_for(m_config.epoch_time - std::chrono::duration(std::chrono::high_resolution_clock::now() - update_beginning));
-}
+		}
 	}
 	draw_thread.join();
 	m_window.close();
 }
-
-
-
-

@@ -4,9 +4,6 @@
 #include <vector>
 #include <chrono>
 
-
-
-
 struct Config {
 	using point = sf::Vector2i;
 	using uint = unsigned int;

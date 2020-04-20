@@ -78,7 +78,6 @@
     <IntDir>temp\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformTarget)</TargetName>
     <CopyLocalDebugSymbols>false</CopyLocalDebugSymbols>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>

@@ -26,4 +26,3 @@ const Cell::uint Cell::get_status() const noexcept
 {
 	return m_status;
 }
-
